@@ -6,7 +6,7 @@ A personal drill/reference tool for learning Cantonese before a Hong Kong trip â
 class notes, with a sentence builder for the grammar patterns and spaced-repetition drilling.
 
 **Stack:** Vite + React + TypeScript, CSS Modules + Sass, Supabase (Postgres + anon auth) for
-cross-device sync, packaged as an installable PWA. No standing Node/Python server.
+cross-device sync, packaged as an installable PWA.
 
 ## Getting started
 
