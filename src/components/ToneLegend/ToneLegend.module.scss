@@ -1,0 +1,26 @@
+@import '../../styles/mixins';
+
+.tones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.pill {
+  @include mono-label;
+  padding: 4px 9px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--paper);
+  opacity: 0.85;
+}
+
+.swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}

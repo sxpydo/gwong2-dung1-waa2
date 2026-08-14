@@ -1,0 +1,42 @@
+@import './variables';
+
+@mixin card-base {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.015);
+}
+
+@mixin card-elevated {
+  @include card-base;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+@mixin row-divider {
+  border-top: 1px solid var(--line);
+  &:first-child {
+    border-top: none;
+  }
+}
+
+@mixin mono-label($color: var(--slate)) {
+  font-family: $font-mono;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: $color;
+}
+
+@mixin focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--sky);
+    outline-offset: 2px;
+  }
+}
+
+@mixin reduced-motion {
+  @media (prefers-reduced-motion: reduce) {
+    animation: none !important;
+    transition: none !important;
+  }
+}

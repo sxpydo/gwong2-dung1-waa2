@@ -1,0 +1,87 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-bottom: 18px;
+  background: radial-gradient(ellipse at 50% 0%, rgba(255, 61, 127, 0.08), transparent 70%);
+  @include focus-ring;
+}
+
+.cjkBig {
+  font-family: $font-cjk;
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.hint {
+  @include mono-label;
+  margin-top: 14px;
+}
+
+.cjkBack {
+  font-family: $font-cjk;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.jyutBack {
+  font-family: $font-mono;
+  font-size: 15px;
+  color: var(--slate);
+  margin-bottom: 8px;
+}
+
+.engBack {
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.again,
+.good {
+  flex: 1;
+  padding: 13px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: none;
+  font-family: $font-mono;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.15s;
+  @include focus-ring;
+}
+
+.again {
+  color: var(--neon-pink);
+
+  &:hover {
+    background: rgba(255, 61, 127, 0.12);
+    border-color: var(--neon-pink);
+  }
+}
+
+.good {
+  color: var(--jade);
+
+  &:hover {
+    background: rgba(47, 211, 174, 0.12);
+    border-color: var(--jade);
+  }
+}

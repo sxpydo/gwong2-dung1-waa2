@@ -1,0 +1,97 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.card {
+  @include card-elevated;
+  margin-bottom: 16px;
+}
+
+.tag {
+  @include mono-label(var(--violet));
+  font-size: 10px;
+  margin-bottom: 8px;
+}
+
+.cjk {
+  font-family: $font-cjk;
+  font-size: 24px;
+  font-weight: 900;
+  margin-bottom: 4px;
+}
+
+.slot {
+  color: var(--neon-gold);
+  border-bottom: 2px dashed var(--neon-gold);
+  padding: 0 4px;
+}
+
+.slotJ {
+  color: var(--neon-gold);
+}
+
+.jyut {
+  font-family: $font-mono;
+  font-size: 13px;
+  color: var(--slate);
+  margin-bottom: 2px;
+}
+
+.eng {
+  font-size: 13.5px;
+  color: var(--jade);
+  margin-bottom: 14px;
+}
+
+.chipRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  font-family: $font-cjk;
+  background: var(--ink-soft);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 8px 14px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--paper);
+  transition: 0.15s;
+  @include focus-ring;
+
+  &:hover {
+    border-color: var(--neon-pink);
+    color: var(--neon-pink);
+  }
+}
+
+.active {
+  background: var(--neon-pink);
+  border-color: var(--neon-pink);
+  color: var(--ink);
+}
+
+.built {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.cjkBuilt {
+  font-family: $font-cjk;
+  font-size: 21px;
+  color: var(--sky);
+  margin-bottom: 3px;
+}
+
+.jyutBuilt {
+  font-family: $font-mono;
+  font-size: 13px;
+  color: var(--slate);
+  margin-bottom: 5px;
+}
+
+.engBuilt {
+  font-size: 14px;
+}

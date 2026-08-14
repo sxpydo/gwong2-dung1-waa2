@@ -1,0 +1,26 @@
+// ---- Design tokens: HK neon / cha-chaan-teng palette ----
+:root {
+  --ink: #12162a;
+  --ink-soft: #1c2140;
+  --paper: #f3efe3;
+  --slate: #98a0c0;
+  --neon-pink: #ff3d7f;
+  --neon-gold: #ffc94d;
+  --jade: #2fd3ae;
+  --violet: #b98bff;
+  --sky: #5ec8ff;
+  --line: rgba(243, 239, 227, 0.12);
+
+  // tone colors — consistent across the whole app
+  --t1: #ffc94d;
+  --t2: #2fd3ae;
+  --t3: #f3efe3;
+  --t4: #5ec8ff;
+  --t5: #ff3d7f;
+  --t6: #b98bff;
+}
+
+$font-display: 'Archivo Black', sans-serif;
+$font-cjk: 'Noto Sans HK', sans-serif;
+$font-mono: 'IBM Plex Mono', monospace;
+$font-body: 'Inter', sans-serif;
