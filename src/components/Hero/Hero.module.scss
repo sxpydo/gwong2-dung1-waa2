@@ -1,0 +1,68 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.hero {
+  position: relative;
+  padding: 18px 4px 26px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  @include mono-label(var(--jade));
+  margin: 0 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--jade);
+  box-shadow: 0 0 8px var(--jade);
+}
+
+.title {
+  font-family: $font-display;
+  font-weight: 400;
+  font-size: clamp(30px, 7vw, 44px);
+  line-height: 1.02;
+  margin: 0 0 6px;
+  letter-spacing: -0.01em;
+}
+
+.cjk {
+  font-family: $font-cjk;
+  font-weight: 900;
+  color: var(--neon-pink);
+  text-shadow: 0 0 22px rgba(255, 61, 127, 0.45);
+}
+
+.sub {
+  color: var(--slate);
+  font-size: 15px;
+  max-width: 56ch;
+  margin: 0 0 18px;
+  line-height: 1.5;
+}
+
+.countdown {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: $font-mono;
+  background: var(--ink-soft);
+  border: 1px solid var(--line);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--slate);
+
+  b {
+    color: var(--neon-gold);
+    font-size: 17px;
+    font-weight: 600;
+  }
+}

@@ -1,0 +1,65 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.row {
+  padding: 14px 18px;
+  @include row-divider;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.main {
+  flex: 1;
+}
+
+.cjk {
+  font-family: $font-cjk;
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+
+.jyut {
+  font-family: $font-mono;
+  font-size: 13px;
+  color: var(--slate);
+  margin-bottom: 5px;
+}
+
+.eng {
+  font-size: 14px;
+  color: var(--paper);
+  opacity: 0.92;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--slate);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.star {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  color: var(--slate);
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.15s;
+  @include focus-ring;
+}
+
+.starred {
+  color: var(--neon-gold);
+  border-color: var(--neon-gold);
+  background: rgba(255, 201, 77, 0.1);
+}

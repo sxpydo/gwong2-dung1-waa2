@@ -1,0 +1,83 @@
+@import '../../styles/variables';
+@import '../../styles/mixins';
+
+.cat {
+  @include card-base;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: none;
+  border: none;
+  color: var(--paper);
+  padding: 16px 18px;
+  cursor: pointer;
+  text-align: left;
+  @include focus-ring;
+}
+
+.name {
+  font-family: $font-display;
+  font-weight: 400;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.emoji {
+  font-size: 19px;
+}
+
+.right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.count {
+  @include mono-label;
+}
+
+.chev {
+  transition: transform 0.2s;
+  color: var(--slate);
+  font-size: 13px;
+}
+
+.open .chev {
+  transform: rotate(90deg);
+}
+
+.body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.35s ease;
+}
+
+.open .body {
+  max-height: 5000px;
+}
+
+.desc {
+  padding: 0 18px 12px;
+  font-size: 12.5px;
+  color: var(--slate);
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.practiceLabel {
+  padding: 0 18px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--jade);
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
