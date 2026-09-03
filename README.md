@@ -1,43 +1,51 @@
-# gwong2-dung1-waa2
-
-## Cantonese Trip Prep
+# Cantonese Trip Prep
 
 A personal drill/reference tool for learning Cantonese before a Hong Kong trip — built from real
 class notes, with a sentence builder for the grammar patterns and spaced-repetition drilling.
 
-**Stack:** Vite + React + TypeScript, CSS Modules + Sass, Supabase (Postgres + anon auth) for
+**Stack:** Vite + React + TypeScript, CSS Modules + Sass, Firebase (Firestore + anonymous auth) for
 cross-device sync, packaged as an installable PWA. No standing Node/Python server.
 
 ## Getting started
 
 ```bash
 npm install
-cp .env.example .env   # fill in your Supabase project URL + anon key (optional — see below)
+cp .env.example .env   # fill in your Firebase project config (optional — see below)
 npm run dev
 ```
 
 Open the printed local URL. On your phone, open the same URL (once deployed — see below) and use
 "Add to Home Screen" to install it as a full-screen app.
 
-### Running without Supabase
+### Running without Firebase
 
 The app works with zero setup — if `.env` is missing or empty, progress (stars + spaced-repetition
 state) saves to `localStorage` on that device only. Fill in `.env` later if you want it synced
 across your phone and laptop.
 
-## Setting up Supabase (optional, for cross-device sync)
+## Setting up Firebase (optional, for cross-device sync)
 
-1. Create a project at [supabase.com](https://supabase.com).
-2. In **Authentication → Providers**, enable **Anonymous sign-ins**. The app is single-user, so
-   anonymous auth just gives you a stable ID to scope your rows — no signup flow needed.
-3. Run the migration in `supabase/migrations/0001_create_review_state.sql` (via the SQL editor, or the Supabase
-   CLI: `supabase db push`). It creates one table, `review_state`, with row-level security so only
-   your own rows are ever readable.
-4. Copy your project URL and anon key (**Settings → API**) into `.env`.
+1. Create a project at [console.firebase.google.com](https://console.firebase.google.com).
+2. In **Build → Authentication → Sign-in method**, enable **Anonymous**. The app is single-user, so
+   anonymous auth just gives you a stable UID to scope your data — no signup flow needed.
+3. In **Build → Firestore Database**, click **Create database** (production mode is fine — the
+   security rules below lock it down regardless of mode).
+4. Deploy the security rules in `firebase/firestore.rules`, either by pasting them into the
+   **Firestore → Rules** tab in the console and publishing, or via the Firebase CLI:
+   ```bash
+   npm install -g firebase-tools
+   firebase login
+   firebase deploy --only firestore:rules
+   ```
+   These rules restrict every document to `users/{uid}/reviews/{phraseId}`, readable and writable
+   only by the matching signed-in user — so your data stays private even though Firestore's default
+   client SDK talks to it directly from the browser.
+5. In **Project settings → General → Your apps**, add a Web app and copy the config values into
+   `.env` (`VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, etc. — see `.env.example`).
 
-Note: the phrase content itself (vocab, grammar, patterns) lives in `src/data/*.ts`, not the
-database — it's static content you edit in code as your lessons progress, not something that needs
-a database table.
+Note: the phrase content itself (vocab, grammar, patterns) lives in `src/data/*.ts`, not Firestore —
+it's static content you edit in code as your lessons progress, not something that needs a database
+collection.
 
 ## Editing content
 
@@ -69,18 +77,27 @@ Deploy `dist/` to Vercel, Netlify, or GitHub Pages — any static host works, si
 backend to run. Connect your repo for push-to-deploy, or drag-and-drop `dist/` onto Netlify for a
 one-off deploy.
 
+### A note on bundle size
+
+The Firebase SDK (auth + Firestore) is noticeably heavier than a minimal REST client — expect
+~600KB before gzip, ~165KB after, versus a much smaller bundle if this were using a lighter backend.
+For a personal tool loaded occasionally before a trip, this doesn't matter in practice (it's still
+a sub-second load on any real connection), but if it ever bothers you, `vite.config.ts` can be given
+a `build.rollupOptions.output.manualChunks` split to move Firebase into its own cached chunk.
+
 ### PWA icons
 
 `vite.config.ts` references `/icon-192.png` and `/icon-512.png` in `public/` — add your own icon
 files there (any square PNG works; you can generate the two sizes from one source image with any
 favicon generator) before deploying, or the install prompt will use a default icon.
 
-### Sass deprecation warnings
+### Sass warnings
 
-You'll see `@import rules are deprecated` warnings during build — that's Dart Sass flagging its own
-future removal of `@import` in favor of `@use`/`@forward` (planned for Sass 3.0). It's fully
-supported today and harmless; not worth the refactor for a project this size, but worth knowing
-about if you see it and wonder.
+You may see `legacy-js-api` deprecation warnings during build — those come from how Vite's Sass
+plugin invokes the `sass` package internally, not from anything in this project's code. All of the
+project's own stylesheets already use the modern `@use` module syntax rather than the deprecated
+`@import`, so there's nothing to fix here; it'll clear up on its own when Vite updates its internal
+Sass invocation.
 
 ## Project structure
 
@@ -88,10 +105,11 @@ about if you see it and wonder.
 src/
   components/     one folder per component, colocated .module.scss
   data/           seed content (intro, categories, grammar, patterns)
-  hooks/          useProgress — Supabase/localStorage + SM-2 glue
-  lib/            supabase client, SM-2 algorithm, Jyutping tone-coloring
+  hooks/          useProgress — Firestore/localStorage + SM-2 glue
+  lib/            firebase client, SM-2 algorithm, Jyutping tone-coloring
   styles/         Sass variables + mixins (design tokens, shared patterns)
   types/          shared TypeScript interfaces
-supabase/
-  migrations/     SQL schema (review_state table + RLS policy)
+firebase/
+  firestore.rules   security rules (per-user access to review documents)
+firebase.json       points the Firebase CLI at the rules file
 ```

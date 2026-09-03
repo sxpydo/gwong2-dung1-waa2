@@ -1,48 +1,29 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ensureAnonSession, supabase } from '../lib/supabase';
+import { collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
+import { auth, db, ensureAnonUser } from '../lib/firebase';
 import { createInitialReview, isDue, nextReviewState } from '../lib/srs';
 import type { DrillGrade, ReviewState } from '../types';
 
 type ReviewMap = Record<string, ReviewState>;
 
-interface DbRow {
-  phrase_id: string;
+interface FirestoreReviewDoc {
+  phraseId: string;
   repetitions: number;
-  interval_days: number;
-  ease_factor: number;
-  due_at: string;
-  last_reviewed_at: string | null;
-  correct_count: number;
-  seen_count: number;
+  intervalDays: number;
+  easeFactor: number;
+  dueAt: string;
+  lastReviewedAt: string | null;
+  correctCount: number;
+  seenCount: number;
   starred: boolean;
 }
 
-function fromDbRow(row: DbRow): ReviewState {
-  return {
-    phraseId: row.phrase_id,
-    repetitions: row.repetitions,
-    intervalDays: row.interval_days,
-    easeFactor: row.ease_factor,
-    dueAt: row.due_at,
-    lastReviewedAt: row.last_reviewed_at,
-    correctCount: row.correct_count,
-    seenCount: row.seen_count,
-    starred: row.starred,
-  };
+function fromDoc(data: FirestoreReviewDoc): ReviewState {
+  return { ...data };
 }
 
-function toDbRow(state: ReviewState) {
-  return {
-    phrase_id: state.phraseId,
-    repetitions: state.repetitions,
-    interval_days: state.intervalDays,
-    ease_factor: state.easeFactor,
-    due_at: state.dueAt,
-    last_reviewed_at: state.lastReviewedAt,
-    correct_count: state.correctCount,
-    seen_count: state.seenCount,
-    starred: state.starred,
-  };
+function toDoc(state: ReviewState): FirestoreReviewDoc {
+  return { ...state };
 }
 
 const LOCAL_KEY = 'cantonese:review-state';
@@ -64,30 +45,36 @@ function saveLocal(map: ReviewMap) {
   }
 }
 
+// Firestore layout: users/{uid}/reviews/{phraseId}
+function reviewsCollection(uid: string) {
+  if (!db) throw new Error('Firestore not initialized');
+  return collection(db, 'users', uid, 'reviews');
+}
+
 export function useProgress() {
   const [reviews, setReviews] = useState<ReviewMap>({});
   const [loaded, setLoaded] = useState(false);
   const [syncEnabled, setSyncEnabled] = useState(false);
+  const [uid, setUid] = useState<string | null>(null);
 
   useEffect(() => {
     (async () => {
-      if (supabase) {
-        const session = await ensureAnonSession();
-        if (session) {
+      if (db && auth) {
+        const user = await ensureAnonUser();
+        if (user) {
           setSyncEnabled(true);
-          const { data, error } = await supabase.from('review_state').select('*');
-          if (!error && data) {
-            const map: ReviewMap = {};
-            (data as DbRow[]).forEach((row) => {
-              map[row.phrase_id] = fromDbRow(row);
-            });
-            setReviews(map);
-            setLoaded(true);
-            return;
-          }
+          setUid(user.uid);
+          const snapshot = await getDocs(reviewsCollection(user.uid));
+          const map: ReviewMap = {};
+          snapshot.forEach((docSnap) => {
+            map[docSnap.id] = fromDoc(docSnap.data() as FirestoreReviewDoc);
+          });
+          setReviews(map);
+          setLoaded(true);
+          return;
         }
       }
-      // Fallback: local-only mode (no Supabase env vars configured).
+      // Fallback: local-only mode (no Firebase env vars configured, or sign-in failed).
       setReviews(loadLocal());
       setLoaded(true);
     })();
@@ -100,15 +87,11 @@ export function useProgress() {
         if (!syncEnabled) saveLocal(next);
         return next;
       });
-      if (syncEnabled && supabase) {
-        const session = await ensureAnonSession();
-        await supabase.from('review_state').upsert({
-          ...toDbRow(state),
-          user_id: session?.user.id,
-        });
+      if (syncEnabled && db && uid) {
+        await setDoc(doc(reviewsCollection(uid), state.phraseId), toDoc(state));
       }
     },
-    [syncEnabled]
+    [syncEnabled, uid]
   );
 
   const getOrCreate = useCallback(
@@ -134,13 +117,16 @@ export function useProgress() {
   );
 
   const resetAll = useCallback(async () => {
+    const idsToClear = Object.keys(reviews);
     setReviews({});
-    if (!syncEnabled) saveLocal({});
-    if (syncEnabled && supabase) {
-      const session = await ensureAnonSession();
-      if (session) await supabase.from('review_state').delete().eq('user_id', session.user.id);
+    if (!syncEnabled) {
+      saveLocal({});
+      return;
     }
-  }, [syncEnabled]);
+    if (syncEnabled && db && uid) {
+      await Promise.all(idsToClear.map((phraseId) => deleteDoc(doc(reviewsCollection(uid), phraseId))));
+    }
+  }, [reviews, syncEnabled, uid]);
 
   const dueIds = useMemo(
     () => Object.values(reviews).filter(isDue).map((r) => r.phraseId),
