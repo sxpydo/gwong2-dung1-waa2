@@ -1,16 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import styles from "./App.module.scss";
-import { Hero } from "./components/Hero/Hero";
-import { Tabs, type TabId } from "./components/Tabs/Tabs";
-import { IntroCard } from "./components/IntroCard/IntroCard";
-import { CategoryAccordion } from "./components/CategoryAccordion/CategoryAccordion";
-import { PatternCard } from "./components/PatternCard/PatternCard";
-import { Flashcard } from "./components/Flashcard/Flashcard";
-import { CATEGORIES, ALL_PHRASES } from "./data/categories";
-import { INTRO } from "./data/intro";
-import { PATTERNS } from "./data/patterns";
-import { useProgress } from "./hooks/useProgress";
-import type { DrillMode, Phrase } from "./types";
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import styles from './App.module.scss';
+import { Hero } from './components/Hero/Hero';
+import { Tabs, type TabId } from './components/Tabs/Tabs';
+import { IntroCard } from './components/IntroCard/IntroCard';
+import { CategoryAccordion } from './components/CategoryAccordion/CategoryAccordion';
+import { PatternCard } from './components/PatternCard/PatternCard';
+import { Flashcard } from './components/Flashcard/Flashcard';
+import { CATEGORIES, ALL_PHRASES } from './data/categories';
+import { INTRO } from './data/intro';
+import { PATTERNS } from './data/patterns';
+import { useProgress } from './hooks/useProgress';
+import type { DrillMode, Phrase } from './types';
 
 const ALL_DRILLABLE: Phrase[] = [...INTRO, ...ALL_PHRASES];
 
@@ -24,28 +24,20 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function App() {
-  const [tab, setTab] = useState<TabId>("reference");
-  const [drillMode, setDrillMode] = useState<DrillMode>("all");
+  const [tab, setTab] = useState<TabId>('reference');
+  const [drillMode, setDrillMode] = useState<DrillMode>('all');
   const [, setQueue] = useState<Phrase[]>([]);
   const [current, setCurrent] = useState<Phrase | null>(null);
   const [sessionCorrect, setSessionCorrect] = useState(0);
   const [sessionSeen, setSessionSeen] = useState(0);
   const [streak, setStreak] = useState(0);
 
-  const {
-    reviews,
-    grade,
-    toggleStar,
-    resetAll,
-    dueIds,
-    starredIds,
-  } = useProgress();
+  const { reviews, loaded, syncEnabled, grade, toggleStar, resetAll, dueIds, starredIds } = useProgress();
   const starredSet = useMemo(() => new Set(starredIds), [starredIds]);
 
   const pool = useMemo(() => {
-    if (drillMode === "starred")
-      return ALL_DRILLABLE.filter((p) => starredSet.has(p.id));
-    if (drillMode === "due") {
+    if (drillMode === 'starred') return ALL_DRILLABLE.filter((p) => starredSet.has(p.id));
+    if (drillMode === 'due') {
       const dueSet = new Set(dueIds);
       // phrases never reviewed are always "due" too
       return ALL_DRILLABLE.filter((p) => dueSet.has(p.id) || !reviews[p.id]);
@@ -66,7 +58,7 @@ export default function App() {
   }, [pool]);
 
   useEffect(() => {
-    if (tab === "drill" && !current && pool.length > 0) {
+    if (tab === 'drill' && !current && pool.length > 0) {
       nextCard();
     }
   }, [tab, current, pool, nextCard]);
@@ -77,11 +69,11 @@ export default function App() {
     setCurrent(null);
   };
 
-  const handleGrade = (g: "again" | "good") => {
+  const handleGrade = (g: 'again' | 'good') => {
     if (!current) return;
     grade(current.id, g);
     setSessionSeen((n) => n + 1);
-    if (g === "good") {
+    if (g === 'good') {
       setSessionCorrect((n) => n + 1);
       setStreak((n) => n + 1);
     } else {
@@ -92,7 +84,7 @@ export default function App() {
   };
 
   const handleReset = async () => {
-    if (!confirm("Reset all drill progress? Starred phrases stay.")) return;
+    if (!confirm('Reset all drill progress? Starred phrases stay.')) return;
     await resetAll();
     setSessionCorrect(0);
     setSessionSeen(0);
@@ -106,7 +98,7 @@ export default function App() {
       <Hero />
       <Tabs active={tab} onChange={setTab} />
 
-      {tab === "reference" && (
+      {tab === 'reference' && (
         <div>
           <IntroCard starredIds={starredSet} onToggleStar={toggleStar} />
           {CATEGORIES.map((cat) => (
@@ -120,7 +112,7 @@ export default function App() {
         </div>
       )}
 
-      {tab === "builder" && (
+      {tab === 'builder' && (
         <div>
           {PATTERNS.map((pattern, i) => (
             <PatternCard key={i} pattern={pattern} />
@@ -128,24 +120,30 @@ export default function App() {
         </div>
       )}
 
-      {tab === "drill" && (
+      {tab === 'drill' && (
         <div>
+          {!syncEnabled && loaded && (
+            <div className={styles.localNotice}>
+              Progress is saving to this device only. Add Firebase credentials to .env to sync
+              across devices.
+            </div>
+          )}
           <div className={styles.modeToggle}>
             <button
-              className={`${styles.modeChip} ${drillMode === "all" ? styles.modeActive : ""}`}
-              onClick={() => handleModeChange("all")}
+              className={`${styles.modeChip} ${drillMode === 'all' ? styles.modeActive : ''}`}
+              onClick={() => handleModeChange('all')}
             >
               All phrases
             </button>
             <button
-              className={`${styles.modeChip} ${drillMode === "starred" ? styles.modeActive : ""}`}
-              onClick={() => handleModeChange("starred")}
+              className={`${styles.modeChip} ${drillMode === 'starred' ? styles.modeActive : ''}`}
+              onClick={() => handleModeChange('starred')}
             >
               Starred only
             </button>
             <button
-              className={`${styles.modeChip} ${drillMode === "due" ? styles.modeActive : ""}`}
-              onClick={() => handleModeChange("due")}
+              className={`${styles.modeChip} ${drillMode === 'due' ? styles.modeActive : ''}`}
+              onClick={() => handleModeChange('due')}
             >
               Due for review
             </button>
@@ -168,9 +166,9 @@ export default function App() {
 
           {pool.length === 0 ? (
             <div className={styles.empty}>
-              {drillMode === "starred"
-                ? "No starred phrases yet — star some in the Reference tab."
-                : "Nothing due right now — check back later or drill All phrases."}
+              {drillMode === 'starred'
+                ? 'No starred phrases yet — star some in the Reference tab.'
+                : 'Nothing due right now — check back later or drill All phrases.'}
             </div>
           ) : (
             current && <Flashcard phrase={current} onGrade={handleGrade} />
