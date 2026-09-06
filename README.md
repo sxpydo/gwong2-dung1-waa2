@@ -1,6 +1,6 @@
 # Cantonese Trip Prep
 
-A personal drill/reference tool for learning Cantonese before a Hong Kong trip — built from real
+A personal drill/reference tool for learning Cantonese before my solo trip to Hong Kong — built from real
 class notes, with a sentence builder for the grammar patterns and spaced-repetition drilling.
 
 **Stack:** Vite + React + TypeScript, CSS Modules + Sass, Firebase (Firestore + anonymous auth) for
@@ -10,7 +10,7 @@ cross-device sync, packaged as an installable PWA. No standing Node/Python serve
 
 ```bash
 npm install
-cp .env.example .env   # fill in your Firebase project config (optional — see below)
+cp .env
 npm run dev
 ```
 
@@ -32,17 +32,19 @@ across your phone and laptop.
    security rules below lock it down regardless of mode).
 4. Deploy the security rules in `firebase/firestore.rules`, either by pasting them into the
    **Firestore → Rules** tab in the console and publishing, or via the Firebase CLI:
-   ```bash
+
+```bash
    npm install -g firebase-tools
    firebase login
    firebase deploy --only firestore:rules
-   ```
-   These rules restrict every document to `users/{uid}/reviews/{phraseId}`, readable and writable
-   only by the matching signed-in user — so your data stays private even though Firestore's default
-   client SDK talks to it directly from the browser.
-5. In **Project settings → General → Your apps**, add a Web app and copy the config values into
-   `.env` (`VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, etc. — see `.env.example`).
+```
 
+These rules restrict every document to `users/{uid}/reviews/{phraseId}`, readable and writable
+only by the matching signed-in user — so your data stays private even though Firestore's default
+client SDK talks to it directly from the browser. 5. In **Project settings → General → Your apps**, add a Web app and copy the config values into
+`.env` (`VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, etc. — see `.env.example`).
+
+ 
 Note: the phrase content itself (vocab, grammar, patterns) lives in `src/data/*.ts`, not Firestore —
 it's static content you edit in code as your lessons progress, not something that needs a database
 collection.
@@ -55,9 +57,8 @@ collection.
   time words)
 - `src/data/patterns.ts` — sentence-builder templates; use `___` as the blank, it can repeat within
   a template (e.g. the A-not-A question pattern)
-
-Every phrase needs a unique `id` — the `withIds()` helper in `categories.ts` generates these for you
-from the array index, so just add entries to the arrays.
+  Every phrase needs a unique `id` — the `withIds()` helper in `categories.ts` generates these for you
+  from the array index, so just add entries to the arrays.
 
 ## Spaced repetition
 
@@ -80,7 +81,7 @@ one-off deploy.
 ### A note on bundle size
 
 The Firebase SDK (auth + Firestore) is noticeably heavier than a minimal REST client — expect
-~600KB before gzip, ~165KB after, versus a much smaller bundle if this were using a lighter backend.
+~500KB before gzip, ~160KB after, versus a much smaller bundle if this were using a lighter backend.
 For a personal tool loaded occasionally before a trip, this doesn't matter in practice (it's still
 a sub-second load on any real connection), but if it ever bothers you, `vite.config.ts` can be given
 a `build.rollupOptions.output.manualChunks` split to move Firebase into its own cached chunk.
