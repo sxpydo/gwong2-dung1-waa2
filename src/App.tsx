@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './App.module.scss';
 import { Hero } from './components/Hero/Hero';
+import { AccountBar } from './components/AccountBar/AccountBar';
 import { Tabs, type TabId } from './components/Tabs/Tabs';
 import { IntroCard } from './components/IntroCard/IntroCard';
 import { CategoryAccordion } from './components/CategoryAccordion/CategoryAccordion';
@@ -32,7 +33,7 @@ export default function App() {
   const [sessionSeen, setSessionSeen] = useState(0);
   const [streak, setStreak] = useState(0);
 
-  const { reviews, loaded, syncEnabled, grade, toggleStar, resetAll, dueIds, starredIds } = useProgress();
+  const { reviews, loaded, syncEnabled, grade, toggleStar, resetAll, dueIds, starredIds, user, isGoogleLinked, signIn, signOut } = useProgress();
   const starredSet = useMemo(() => new Set(starredIds), [starredIds]);
 
   const pool = useMemo(() => {
@@ -96,6 +97,14 @@ export default function App() {
   return (
     <div className={styles.wrap}>
       <Hero />
+      <AccountBar
+       loaded={loaded}
+       isGoogleLinked={isGoogleLinked}
+       displayName={user?.displayName ?? null}
+       photoURL={user?.photoURL ?? null}
+       onSignIn={signIn}
+       onSignOut={signOut}
+      />
       <Tabs active={tab} onChange={setTab} />
 
       {tab === 'reference' && (
