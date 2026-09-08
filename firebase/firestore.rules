@@ -1,7 +1,9 @@
 rules_version = '2';
 
-// Cantonese Trip Prep — each anonymous user can only read/write their own
-// review-state documents, stored at users/{uid}/reviews/{phraseId}.
+// Cantonese Trip Prep — each signed-in user (anonymous or Google-linked) can
+// only read/write their own review-state documents, stored at
+// users/{uid}/reviews/{phraseId}. Linking an anonymous session to Google
+// keeps the same uid, so this rule needs no changes for that flow.
 // Phrase content itself lives in the app bundle (src/data), not Firestore.
 service cloud.firestore {
   match /databases/{database}/documents {
